@@ -1,5 +1,6 @@
 <?php
 ob_start();
+$products = $products ?? [];
 ?>
 
 <div class="card shadow border-0 border-start border-5 border-primary mb-4">
@@ -69,7 +70,7 @@ ob_start();
                         <option value="6000 mAh">6000 mAh</option>
                     </select>
                 </div>
-                 
+
                 <div class="col-md-3">
                     <label for="quantity" class="form-label">Quantity <span class="text-danger" aria-hidden="true">*</span></label>
                     <input name="product_quantity" id="quantity" type="number" class="form-control" placeholder="Enter Quantity" value="" required min="0">
@@ -79,9 +80,9 @@ ob_start();
                     <input name="product_image" id="product_image" type="text" class="form-control" placeholder="Enter image filename" value="">
                 </div>
             </div>
-             
+
             <hr class="mt-4 mb-3">
-             
+
             <div>
                 <button type="submit" name="create" class="btn btn-primary">
                     <i class="bi bi-save me-1"></i>Create
@@ -105,7 +106,7 @@ ob_start();
                 <small class="text-muted">View and manage all portable tire inflators in inventory</small>
             </div>
             <div class="col-auto">
-                <span class="badge bg-success">Total: 1 items</span>
+                <span class="badge bg-success">Total: <?= count($products) ?> items</span>
             </div>
         </div>
 
@@ -123,23 +124,38 @@ ob_start();
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>P001</td>
-                        <td>Smart Portable Tire Inflator Pro</td>
-                        <td>RM 149.00</td>
-                        <td>Xiaomi</td>
-                        <td>
-                            <a href="#" class="btn btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-info text-white">
-                                <i class="bi bi-image"></i>
-                            </button>
-                            <a href="#" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
+                    <?php if (!empty($products)): ?>
+                        <?php foreach ($products as $product): ?>
+                            <?php
+                            $id = $product['id'] ?? '';
+                            $productNum = $product['product_num'] ?? $product['product_code'] ?? $id;
+                            $name = $product['product_name'] ?? $product['name'] ?? '';
+                            $price = $product['product_price'] ?? $product['price'] ?? 0;
+                            $brand = $product['product_brand'] ?? $product['brand'] ?? '';
+                            ?>
+                            <tr>
+                                <td><?= htmlspecialchars((string)$productNum) ?></td>
+                                <td><?= htmlspecialchars((string)$name) ?></td>
+                                <td>RM <?= number_format((float)$price, 2) ?></td>
+                                <td><?= htmlspecialchars((string)$brand) ?></td>
+                                <td>
+                                    <a href="products/edit/<?= urlencode((string)$id) ?>" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-info text-white">
+                                        <i class="bi bi-image"></i>
+                                    </button>
+                                    <a href="products/delete/<?= urlencode((string)$id) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this product?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">No products found in the database.</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
