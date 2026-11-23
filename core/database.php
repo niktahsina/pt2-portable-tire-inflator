@@ -3,20 +3,22 @@
 class Database {
     private $connection;
 
-    // Constructor runs automatically when you create a new Database object
     public function __construct() {
         try {
-            // Create the PDO connection (replace a123456 with your actual matric & DB password)
-            $this->connection = new PDO("mysql:host=lrgs.ftsm.ukm.my;dbname=a123456", "a123456", "a123456");
+            // For local Laragon/XAMPP MySQL, host is typically localhost or 127.0.0.1
+            // Update dbname, username, and password to match your database setup
+            $this->connection = new PDO(
+                "mysql:host=localhost;dbname=<A228221>;charset=utf8mb4",
+                "<a228221>",
+                "<bigblackfox>"
+            );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            // Handle connection errors gracefully
             echo "Database connection failed: " . $e->getMessage();
             exit;
         }
     }
 
-    // Method to get the PDO connection
     public function getConnection() {
         return $this->connection;
     }
