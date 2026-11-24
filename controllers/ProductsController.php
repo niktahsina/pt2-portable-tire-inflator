@@ -1,38 +1,64 @@
 <?php
 
-class ProductsController
+class ProductController extends Controller
 {
+    private $model;
+
+    public function __construct()
+    {
+        $this->model = $this->model("productmodel");
+    }
+
     public function index(): void
     {
-        require_once 'models/ProductModel.php';
-        $productModel = new ProductModel();
+        $records = $this->model->readAll();
+        $this->view("products", ["products" => $records]);
+    }
 
+    public function save(): void
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['create'])) {
-                $productModel->createProduct($_POST);
-                header('Location: index.php?url=products');
-                exit;
-            }
-
-            if (isset($_POST['update']) && !empty($_POST['id'])) {
-                $productModel->updateProduct((int) $_POST['id'], $_POST);
-                header('Location: index.php?url=products');
-                exit;
-            }
+            $this->model->create($_POST);
         }
 
-        if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-            $productModel->deleteProduct((int) $_GET['delete']);
-            header('Location: index.php?url=products');
+        header("Location: " . BASE_URL . "productcontroller");
+        exit;
+    }
+
+    public function edit($id): void
+    {
+        $aproduct = $this->model->readById($id);
+
+        if (!$aproduct) {
             exit;
         }
 
-        $editingProduct = null;
-        if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
-            $editingProduct = $productModel->getProductById((int) $_GET['edit']);
+        $this->view("products", [
+            "aproduct" => $aproduct,
+            "products" => $this->model->readAll()
+        ]);
+    }
+
+    public function update(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->model->update($_POST);
         }
 
-        $products = $productModel->getAllProducts();
-        require_once 'views/products.php';
+        header("Location: " . BASE_URL . "productcontroller");
+        exit;
+    }
+
+    public function delete($id): void
+    {
+        $aproduct = $this->model->readById($id);
+
+        if (!$aproduct) {
+            exit;
+        }
+
+        $this->model->delete($id);
+        header("Location: " . BASE_URL . "productcontroller");
+        exit;
     }
 }
